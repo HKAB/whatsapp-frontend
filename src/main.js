@@ -3,13 +3,19 @@
 import Vue from 'vue'
 import App from './App'
 import router from './router'
-import VueMaterial from 'vue-material'
-import 'vue-material/dist/vue-material.min.css'
+import Vuetify from 'vuetify'
+import 'vuetify/dist/vuetify.min.css'
+// import './assets/stylus/main.styl'
+import VeeValidate from 'vee-validate';
 
 
-Vue.config.productionTip = false
-Vue.use(VueMaterial)
-
+// Vue.config.productionTip = false
+Vue.use(Vuetify, {
+  theme: {
+    primary: '#616161'
+  }
+})
+Vue.use(VeeValidate)
 /* eslint-disable no-new */
 new Vue({
   el: '#app',

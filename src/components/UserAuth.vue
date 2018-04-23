@@ -1,121 +1,152 @@
 <template>
-   <!-- <div class="md-size-200 md-size-200"> -->
-      <div class="md-layout">
-        <div class="md-layout-item"></div>
-        <md-tabs>
-          <md-tab id="tab-signin" md-label="Sign in">
-         <form novalidate class="md-layout-item md-size-200" @submit.prevent="signIn">
-            <md-card class="md-layout-item">
-               <md-card-content>
-               <md-field md-clearable>
-                  <md-icon>account_circle</md-icon>
-                  <label class="md-inline">Username</label>
-                  <md-input v-model="username"></md-input>
-               </md-field>
-               <md-field>
-                  <md-icon>lock</md-icon>
-                  <label>Password</label>
-                  <md-input v-model="password" type="password"></md-input>
-               </md-field>
-               <md-card-actions>
-                  <md-button type="submit" class="md-primary">Sign In</md-button>
-               </md-card-actions>
-             </md-card-content>
-            </md-card>
+<v-app>
+  <v-container fill-height>
+    <v-layout align-center justify-center>
+      <v-flex xs12 sm6 offset-sm2>
+        <v-card height="350" width="400">
+          <v-card-title primary-title>
+            <v-layout align-center justify-center>
+              <v-flex>
+                <v-btn icon flat>
+                  <img src="@/assets/laptop.svg" alt="laptop" width="60" height="60">
+                </v-btn>
+              </v-flex>
+            </v-layout>
+          </v-card-title>
+          <v-container grid-list-md text-xs-center>
+            <v-layout row wrap>
+              <v-flex xs1></v-flex>
+              <v-flex xs10>
+                <v-form @submit.prevent="signIn">
+                  <v-text-field prepend-icon="person" class="input-group--focused" label="Username" v-model="username"></v-text-field>
+                  <v-text-field  prepend-icon="lock" class="input-group--focused" label="Password" v-model="password" type="password"></v-text-field>
+                </v-form>
+              </v-flex>
+              <v-flex xs1></v-flex>
+            </v-layout>
+          </v-container>
+          <v-container grid-list-md text-xs-center>
+            <v-layout>
+              <v-flex xs1></v-flex>
+              <v-flex xs3></v-flex>
+              <v-flex xs3></v-flex>
+              <v-card-actions>
+                <v-btn color='primary' :loading="loading" @click="signIn" @click.native="loader = 'loading'" :disabled="loading">
+                  SIGN IN <v-icon right>account_circle</v-icon>
+                </v-btn>
+              </v-card-actions>
+              <v-flex xs1></v-flex>
+            </v-layout>
+          </v-container>
 
-         </form>
-       </md-tab>
-       <md-tab id="tab-signup" md-label="Sign up">
-         <form novalidate class="md-layout-item" @submit.prevent="signUp">
-            <md-card class="md-layout-item">
-               <md-card-content>
-               <md-field md-clearable>
-                  <md-icon>account_circle</md-icon>
-                  <label class="md-inline">Username</label>
-                  <md-input v-model="username"></md-input>
-               </md-field>
-               <md-field>
-                  <md-icon>lock</md-icon>
-                  <label>Password</label>
-                  <md-input v-model="password" type="password"></md-input>
-               </md-field>
-               <md-field>
-                  <md-icon>lock</md-icon>
-                  <label>Repassword</label>
-                  <md-input v-model="repassword" type="password"></md-input>
-               </md-field>
-               <md-card-actions>
-                  <md-button type="submit" class="md-primary">Create user</md-button>
-               </md-card-actions>
-             </md-card-content>
-            </md-card>
-
-         </form>
-       </md-tab>
-       </md-tabs>
-         <div class="md-layout-item"></div>
-      </div>
-   <!-- </div> -->
+        </v-card>
+      </v-flex>
+    </v-layout>
+  </v-container>
+</v-app>
 </template>
 
+
+
+
+
 <script>
-   const j = window.jQuery // JQuery
+const j = window.jQuery // JQuery
 
-   export default {
+export default {
 
-     data() {
-       return {
-         email: '',
-         username: '',
-         password: '',
-         repassword: '',
-       }
-     },
-     methods: {
-       signUp() {
-         console.log(this.$data)
-         j.post('http://localhost:8000/auth/users/create/', this.$data, (data) => {
-             alert("Your account has been created. You will be signed in automatically")
-             this.signIn()
-           })
-           .fail((response) => {
-             alert(response.responseText)
-           })
-       },
+  data: () => ({
+    loading: false,
+    username: '',
+    password: '',
+  }),
 
-       signIn() {
-         const credentials = {
-           username: this.username,
-           password: this.password
-         }
+  props: {
+    source: String
+  },
 
-         j.post('http://localhost:8000/auth/token/create/', credentials, (data) => {
-             sessionStorage.setItem('authToken', data.auth_token)
-             sessionStorage.setItem('username', this.username)
-             this.$router.push('/chats/')
-           })
-           .fail((response) => {
-             alert(response.responseText)
-           })
-       }
-     }
-   }
+  watch: {
+    // loader() {
+    //   const l = this.loader
+    //   this[l] = !this[l]
+    //
+    //   setTimeout(() => (this[l] = false), 3000)
+    //
+    //   this.loader = null
+    // }
+  },
+
+  methods: {
+    signUp() {
+      console.log(this.$data)
+      j.post('http://localhost:8000/auth/users/create/', this.$data, (data) => {
+          alert("Your account has been created. You will be signed in automatically")
+          this.signIn()
+        })
+        .fail((response) => {
+          alert(response.responseText)
+        })
+    },
+
+    signIn() {
+      this.loading = true
+      const credentials = {
+        username: this.username,
+        password: this.password
+      }
+
+      j.post('http://localhost:8000/auth/token/create/', credentials, (data) => {
+          sessionStorage.setItem('authToken', data.auth_token)
+          sessionStorage.setItem('username', this.username)
+          this.$router.push('/chats/')
+        })
+        .fail((response) => {
+          alert(response.responseText)
+        })
+        this.loading = false
+    }
+  }
+}
 </script>
-<style lang="scss" scoped>
-    @import "~vue-material/dist/theme/engine"; // Import the theme engine
+<style>
+.custom-loader {
+  animation: loader 1s infinite;
+  display: flex;
+}
 
-    @include md-register-theme("default", (
-      primary: md-get-palette-color(red, A200), // The primary color of your application
-      accent: md-get-palette-color(blue, A200), // The accent or secondary color
-      theme: light // This can be dark or light
-    ));
+@-moz-keyframes loader {
+  from {
+    transform: rotate(0);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
 
-    @import "~vue-material/dist/theme/all";
+@-webkit-keyframes loader {
+  from {
+    transform: rotate(0);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
 
-   .md-progress-bar {
-   position: absolute;
-   top: 0;
-   right: 0;
-   left: 0;
-   }
+@-o-keyframes loader {
+  from {
+    transform: rotate(0);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes loader {
+  from {
+    transform: rotate(0);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
 </style>
